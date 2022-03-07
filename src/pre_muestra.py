@@ -161,7 +161,8 @@ class PreMuestra(object):
         for parcela in cells_dict_c:
             for ambiente in cells_dict_c[parcela]:
                 for cuadrado in cells_dict_c[parcela][ambiente]:
-                    if len(self.datos_dict[parcela][ambiente][cuadrado]) > puntos_max or len(self.datos_dict[parcela][ambiente][cuadrado]) < self.puntos_min:
+                    # if len(self.datos_dict[parcela][ambiente][cuadrado]) > puntos_max or len(self.datos_dict[parcela][ambiente][cuadrado]) < self.puntos_min:
+                    if len(self.datos_dict[parcela][ambiente][cuadrado]) < self.puntos_min:
                         del self.datos_dict[parcela][ambiente][cuadrado]
                         d += 1
         
