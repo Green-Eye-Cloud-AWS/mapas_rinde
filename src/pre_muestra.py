@@ -156,18 +156,22 @@ class PreMuestra(object):
         if self.puntos_min > puntos_max:
             raise Exception("La cantidad de puntos por cuadrado no es suficiente! ({p_max}/{p_min})".format(p_max=puntos_max, p_min=self.puntos_min))
 
+        arcpy.AddMessage("puntos_max: {}".format(str(puntos_max)))
+        arcpy.AddMessage("puntos_min: {}".format(str(self.puntos_min)))
+
         cells_dict_c = copy.deepcopy(self.datos_dict)
-        d = 0
         for parcela in cells_dict_c:
             for ambiente in cells_dict_c[parcela]:
                 for cuadrado in cells_dict_c[parcela][ambiente]:
                     # if len(self.datos_dict[parcela][ambiente][cuadrado]) > puntos_max or len(self.datos_dict[parcela][ambiente][cuadrado]) < self.puntos_min:
                     if len(self.datos_dict[parcela][ambiente][cuadrado]) < self.puntos_min:
                         del self.datos_dict[parcela][ambiente][cuadrado]
-                        d += 1
-        
-        arcpy.AddMessage("{n} cuadrado(s) eliminados en normalización de cantidad de puntos por cuadrado".format(n=d))
-        
+    
+        arcpy.AddMessage("Cuadrados por parcela y ambiente")
+        for parcela in cells_dict_c:
+            for ambiente in cells_dict_c[parcela]:
+                arcpy.AddMessage("{parcela} ({ambiente}): {cuadrados}".format(parcela=parcela, ambiente=ambiente, cuadrados=str(len(self.datos_dict[parcela][ambiente]))))
+
         self.puntos_min = int(self.puntos_min) - 1
 
 
@@ -182,6 +186,8 @@ class PreMuestra(object):
             min_rep = self.GL_OBJETIVO // (len(self.parcelas) * len(self.ambientes)) + 1
 
         self.repeticiones = max(self.repeticiones, min_rep)
+
+        arcpy.AddMessage("min_rep: {}".format(str(self.repeticiones)))
 
 
     def _chequear_ambientes(self):

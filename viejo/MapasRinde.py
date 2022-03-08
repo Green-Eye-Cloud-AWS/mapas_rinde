@@ -478,31 +478,14 @@ if ambientes == 1 or dca1f_por_ambiente == True or dca1f_por_ambiente == "true":
 
 arcpy.AddMessage("Ambientes por parcela: " + str(ambientes))
 
-if tipo == "dca1f":
-    min_rep = math.ceil(gl_obj / parcelas + 1)
-elif tipo == "dbca1f":
-    min_rep = math.ceil(gl_obj / parcelas)
-elif tipo == "dca2f":
-    min_rep = math.ceil(gl_obj / (parcelas * ambientes) + 1)
-
-min_rep = max(int(rep_config), int(min_rep))
-
 """
-#
-# PUNTOS X CUADRADO (limpieza de cuadrados con menos puntos que el minimo)
-# 
-
-cells_dict_c = copy.deepcopy(cells_dict)
-for parcela in cells_dict_c:
-    for ambiente in cells_dict_c[parcela]:
-        for cuadrado in cells_dict_c[parcela][ambiente]:
-
-            if len(cells_dict[parcela][ambiente][cuadrado]) < puntos_min:
-                del cells_dict[parcela][ambiente][cuadrado]
-"""
-
 #
 # PUNTOS X CUADRADO (limpieza de cuadrados con pocos o muchos puntos)
+# 
+"""
+
+#
+# PUNTOS X CUADRADO (limpieza de cuadrados con menos puntos que el minimo)
 # 
 
 puntos = []
@@ -520,16 +503,36 @@ if puntos_min > puntos_max:
 if puntos_min > puntos_max:
     raise Exception("La cantidad de puntos por cuadrado no es suficiente! " + str(puntos_max)  + "/" + str(puntos_min))
 
+arcpy.AddMessage("puntos_max: " + str(puntos_max))
+arcpy.AddMessage("puntos_min: " + str(puntos_min))
+
 cells_dict_c = copy.deepcopy(cells_dict)
 for parcela in cells_dict_c:
     for ambiente in cells_dict_c[parcela]:
         for cuadrado in cells_dict_c[parcela][ambiente]:
-            if len(cells_dict[parcela][ambiente][cuadrado]) > puntos_max or len(cells_dict[parcela][ambiente][cuadrado]) < puntos_min:
+            #if len(cells_dict[parcela][ambiente][cuadrado]) > puntos_max or len(cells_dict[parcela][ambiente][cuadrado]) < puntos_min:
+            if len(cells_dict[parcela][ambiente][cuadrado]) < puntos_min:
                 del cells_dict[parcela][ambiente][cuadrado]
+
+arcpy.AddMessage("Cuadrados por parcela y ambiente")
+for parcela in cells_dict_c:
+    for ambiente in cells_dict_c[parcela]:
+        arcpy.AddMessage(parcela + " " + ambiente + " " + str(len(cells_dict[parcela][ambiente])))
 
 #
 # CUADRADO X AMBIENTE (seleccion al azar de cantidad minima de cuadrados por ambiente)
 # 
+
+if tipo == "dca1f":
+    min_rep = math.ceil(gl_obj / parcelas + 1)
+elif tipo == "dbca1f":
+    min_rep = math.ceil(gl_obj / parcelas)
+elif tipo == "dca2f":
+    min_rep = math.ceil(gl_obj / (parcelas * ambientes) + 1)
+
+min_rep = max(int(rep_config), int(min_rep))
+
+arcpy.AddMessage("min_rep: " + str(min_rep))
 
 aux_forgiveness = pd.DataFrame(columns=["Parcelas","Diferencia_estadistica","Rinde_Parcela","Rinde_Testigo","Nombre","Campo","Ambiente","DMS","Diferencia"])
 
@@ -826,7 +829,6 @@ def Assumptions(data,writer,ambiente):
     Aditividad
         Para bloques o factores
         Promedio de rinde para cada ambiente por tratamiento
-
     """
 
     arcpy.AddMessage("SUPUESTOS")
